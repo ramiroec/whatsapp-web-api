@@ -1,5 +1,7 @@
 // routes/whatsapp.js
 const express = require('express');
+/ routes/whatsapp.js
+const express = require('express');
 const router = express.Router();
 const { Client } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
@@ -21,6 +23,16 @@ client.on('ready', () => {
     console.log('Client is ready!');
 });
 
+// Reglas básicas del chatbot
+const basicResponses = {
+    'hola': '¡Hola! ¿Cómo estás?',
+    'adiós': '¡Adiós! Que tengas un buen día.',
+    '¿cómo estás?': 'Estoy bien, gracias por preguntar.',
+    'gracias': 'De nada, ¡estoy aquí para ayudarte!',
+    'hora': `La hora actual es ${new Date().toLocaleTimeString()}.`,
+    // Agrega más respuestas según lo que necesites
+};
+
 client.on('message_create', message => {
     console.log('Mensaje recibido:', message.body);
 
@@ -32,8 +44,11 @@ client.on('message_create', message => {
         timestamp: message.timestamp,
     });
 
-    // Ejemplo de respuesta a un comando específico
-    if (message.body === '!ping') {
+    // Respuesta automática a mensajes específicos
+    const normalizedMessage = message.body.toLowerCase().trim(); // Normalizar el mensaje para evitar errores con mayúsculas
+    if (basicResponses[normalizedMessage]) {
+        message.reply(basicResponses[normalizedMessage]);
+    } else if (message.body === '!ping') {
         message.reply('pong');
     }
 });
